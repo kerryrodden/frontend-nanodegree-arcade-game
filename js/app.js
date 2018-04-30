@@ -5,7 +5,9 @@ const NUM_COLS = 5;
 const NUM_ROWS = 6;
 
 // Enemies our player must avoid
-// Parameter: row, which of the 3 road lanes this enemy should appear in (1, 2, or 3)
+// Parameters:
+// row, which of the 3 road lanes this enemy should appear in (1, 2, or 3)
+// speed, proportion of a column width moved in each tick
 var Enemy = function (row, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -26,6 +28,14 @@ Enemy.prototype.calculateNewPosition = function (dt) {
     this.col = (this.col + this.speed * dt * COL_WIDTH) % (NUM_COLS + 1);
 };
 
+Enemy.prototype.checkCollisions = function () {
+    var playerPosition = player.getPosition();
+    if (this.row === playerPosition.row && Math.floor(this.col - 0.3) === playerPosition.col) {
+        console.log(this.col);
+        player = new Player();
+    }
+}
+
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function (dt) {
@@ -35,6 +45,7 @@ Enemy.prototype.update = function (dt) {
     this.calculateNewPosition(dt);
     this.x = COL_WIDTH * (this.col - 1);
     this.y = ROW_HEIGHT * this.row - ROW_OFFSET; // TODO: this never changes, for a given enemy
+    this.checkCollisions();
 };
 
 // Draw the enemy on the screen, required method for game
@@ -49,8 +60,6 @@ var Player = function () {
     // Initial (zero based) location
     this.col = 2;
     this.row = 5;
-
-    // TODO: speed
 };
 
 // Update the player's position
@@ -81,6 +90,11 @@ Player.prototype.handleInput = function (direction) {
             this.col = Math.min(this.col + 1, NUM_COLS - 1);
             break;
     }
+}
+
+// Return an object indicating which row and column the player is currently in
+Player.prototype.getPosition = function () {
+    return { col: this.col, row: this.row };
 }
 
 // Now instantiate your objects.
