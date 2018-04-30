@@ -1,4 +1,4 @@
-const COL_HEIGHT = 101;
+const COL_WIDTH = 101;
 const ROW_HEIGHT = 83;
 const ROW_OFFSET = 20;
 const NUM_COLS = 5;
@@ -6,7 +6,7 @@ const NUM_ROWS = 6;
 
 // Enemies our player must avoid
 // Parameter: row, which of the 3 road lanes this enemy should appear in (1, 2, or 3)
-var Enemy = function (row) {
+var Enemy = function (row, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -14,13 +14,16 @@ var Enemy = function (row) {
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
 
-    // Initial location
+    // Initial (zero based) location
     this.col = 0;
     this.row = row;
-    this.x = COL_HEIGHT * this.col;
-    this.y = ROW_HEIGHT * this.row - ROW_OFFSET;
 
-    // TODO: speed
+    // Speed (proportion of a column width moved in each tick)
+    this.speed = speed;
+};
+
+Enemy.prototype.calculateNewPosition = function (dt) {
+    this.col = (this.col + this.speed * dt * COL_WIDTH) % (NUM_COLS + 1);
 };
 
 // Update the enemy's position, required method for game
@@ -29,6 +32,9 @@ Enemy.prototype.update = function (dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    this.calculateNewPosition(dt);
+    this.x = COL_WIDTH * (this.col - 1);
+    this.y = ROW_HEIGHT * this.row - ROW_OFFSET; // TODO: this never changes, for a given enemy
 };
 
 // Draw the enemy on the screen, required method for game
@@ -40,11 +46,9 @@ Enemy.prototype.render = function () {
 var Player = function () {
     this.sprite = 'images/char-boy.png';
 
-    // Initial location
+    // Initial (zero based) location
     this.col = 2;
     this.row = 5;
-    this.x = COL_HEIGHT * this.col;
-    this.y = ROW_HEIGHT * this.row - ROW_OFFSET;
 
     // TODO: speed
 };
@@ -52,7 +56,7 @@ var Player = function () {
 // Update the player's position
 // Parameter: dt, a time delta between ticks (TODO: is dt needed for the player?)
 Player.prototype.update = function (dt) {
-    this.x = COL_HEIGHT * this.col;
+    this.x = COL_WIDTH * this.col;
     this.y = ROW_HEIGHT * this.row - ROW_OFFSET;
 };
 
@@ -84,9 +88,9 @@ Player.prototype.handleInput = function (direction) {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-allEnemies.push(new Enemy(1));
-allEnemies.push(new Enemy(2));
-allEnemies.push(new Enemy(3));
+allEnemies.push(new Enemy(1, 0.01));
+allEnemies.push(new Enemy(2, 0.02));
+allEnemies.push(new Enemy(3, 0.03));
 
 var player = new Player();
 
