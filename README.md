@@ -1,6 +1,6 @@
 # Arcade game clone
 
-HTML, CSS, and JavaScript for a project from [Udacity's Front-End Developer nanodegree] (https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001).
+HTML, CSS, and JavaScript for a project from [Udacity's Front-End Developer nanodegree](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001).
 
 ## How to run
 
