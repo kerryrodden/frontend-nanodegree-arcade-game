@@ -9,7 +9,7 @@ const NUM_ENEMIES = 3;
 // Utility function to generate a random speed for the enemy (in pixels per second)
 function randomSpeed() {
     // Choose a random number of columns per second, then multiply by column width
-    return (Math.random() * 3 + 2) * COL_WIDTH;
+    return (Math.random() * 3 + 3) * COL_WIDTH;
 }
 
 // Enemies our player must avoid
@@ -38,7 +38,7 @@ Enemy.prototype.checkCollisions = function () {
     var xDist = Math.abs(playerX - this.x);
     var yDist = Math.abs(playerY - this.y);
     if (xDist < COL_WIDTH * 0.4 && yDist === ROW_OFFSET) {
-        player = new Player();
+        player.reset();
     }
 };
 
@@ -70,6 +70,9 @@ var Player = function () {
     // Initial (zero based) location
     this.col = 2;
     this.row = 5;
+
+    // If the player is currently in a winning state
+    this.won = false;
 };
 
 // Update the player's screen coordinates
@@ -80,14 +83,22 @@ Player.prototype.update = function () {
 
 // Draw the player on the screen
 Player.prototype.render = function () {
+    if (this.won) {
+        ctx.drawImage(Resources.get('images/Selector.png'), this.x, this.y);
+    }
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Change the player's position according to keyboard input
 Player.prototype.handleInput = function (direction) {
+    // Temporarily ignore input during winning state
+    if (this.won) {
+        return;
+    }
     switch (direction) {
         case 'up':
             this.row = Math.max(this.row - 1, 0);
+            this.checkForWinningState();
             break;
         case 'down':
             this.row = Math.min(this.row + 1, NUM_ROWS - 1);
@@ -99,12 +110,25 @@ Player.prototype.handleInput = function (direction) {
             this.col = Math.min(this.col + 1, NUM_COLS - 1);
             break;
     }
-}
+};
 
 // Return an object indicating which row and column the player is currently in
 Player.prototype.getPosition = function () {
     return { col: this.col, row: this.row };
-}
+};
+
+Player.prototype.reset = function () {
+    this.col = 2;
+    this.row = 5;
+    this.won = false;
+};
+
+Player.prototype.checkForWinningState = function () {
+    if (this.row === 0) {
+        this.won = true;
+        setTimeout(this.reset.bind(this), 2000);
+    }
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
