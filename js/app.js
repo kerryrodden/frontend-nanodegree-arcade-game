@@ -3,12 +3,19 @@ const ROW_HEIGHT = 83;
 const ROW_OFFSET = 20;
 const NUM_COLS = 5;
 const NUM_ROWS = 6;
+const BOARD_WIDTH = COL_WIDTH * NUM_COLS;
+const NUM_ENEMIES = 3;
+
+// Utility function to generate a random speed for the enemy (in pixels per second)
+function randomSpeed() {
+    // Choose a random number of columns per second, then multiply by column width
+    return (Math.random() * 3 + 2) * COL_WIDTH;
+}
 
 // Enemies our player must avoid
 // Parameters:
 // row, which of the 3 road lanes this enemy should appear in (1, 2, or 3)
-// speed, proportion of a column width moved in each tick
-var Enemy = function (row, speed) {
+var Enemy = function (row) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -16,25 +23,24 @@ var Enemy = function (row, speed) {
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
 
-    // Initial (zero based) location
-    this.col = 0;
-    this.row = row;
+    // Initial location
+    this.x = -COL_WIDTH;
+    this.y = ROW_HEIGHT * row - ROW_OFFSET; // This never changes, for a given enemy
 
-    // Speed (proportion of a column width moved in each tick)
-    this.speed = speed;
-};
-
-Enemy.prototype.calculateNewPosition = function (dt) {
-    this.col = (this.col + this.speed * dt * COL_WIDTH) % (NUM_COLS + 1);
+    // Speed (pixels per second)
+    this.speed = randomSpeed();
 };
 
 Enemy.prototype.checkCollisions = function () {
     var playerPosition = player.getPosition();
-    if (this.row === playerPosition.row && Math.floor(this.col - 0.3) === playerPosition.col) {
-        console.log(this.col);
+    var playerX = playerPosition.col * COL_WIDTH;
+    var playerY = playerPosition.row * ROW_HEIGHT;
+    var xDist = Math.abs(playerX - this.x);
+    var yDist = Math.abs(playerY - this.y);
+    if (xDist < COL_WIDTH * 0.4 && yDist === ROW_OFFSET) {
         player = new Player();
     }
-}
+};
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -42,9 +48,13 @@ Enemy.prototype.update = function (dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.calculateNewPosition(dt);
-    this.x = COL_WIDTH * (this.col - 1);
-    this.y = ROW_HEIGHT * this.row - ROW_OFFSET; // TODO: this never changes, for a given enemy
+    this.x = this.x + this.speed * dt;
+    if (this.x > BOARD_WIDTH) {
+        // Enemy has gone off screen; start again from the beginning
+        this.x = -COL_WIDTH;
+        // Change the enemy's speed, to keep things interesting
+        this.speed = randomSpeed();
+    }
     this.checkCollisions();
 };
 
@@ -62,9 +72,8 @@ var Player = function () {
     this.row = 5;
 };
 
-// Update the player's position
-// Parameter: dt, a time delta between ticks (TODO: is dt needed for the player?)
-Player.prototype.update = function (dt) {
+// Update the player's screen coordinates
+Player.prototype.update = function () {
     this.x = COL_WIDTH * this.col;
     this.y = ROW_HEIGHT * this.row - ROW_OFFSET;
 };
@@ -102,9 +111,10 @@ Player.prototype.getPosition = function () {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-allEnemies.push(new Enemy(1, 0.01));
-allEnemies.push(new Enemy(2, 0.02));
-allEnemies.push(new Enemy(3, 0.03));
+for (var i = 0; i < NUM_ENEMIES; i++) {
+    var row = i % 3 + 1;
+    allEnemies.push(new Enemy(row));
+}
 
 var player = new Player();
 
