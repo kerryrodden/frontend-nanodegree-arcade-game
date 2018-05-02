@@ -44,12 +44,11 @@ var Enemy = function (row) {
 // Determine whether this enemy is near enough to the player to cause a collision
 Enemy.prototype.checkCollisions = function () {
     var playerPosition = player.getPosition();
-    var playerX = playerPosition.col * COL_WIDTH;
-    var playerY = playerPosition.row * ROW_HEIGHT;
-    var xDist = Math.abs(playerX - this.x);
-    var yDist = Math.abs(playerY - this.y);
+    var xDist = Math.abs(player.x - this.x);
+    var yDist = Math.abs(player.y - this.y);
     // Horizontal collision distance = 40% of the column width
-    if (xDist < COL_WIDTH * 0.4 && yDist === ROW_OFFSET) {
+    if (xDist < COL_WIDTH * 0.4 && yDist === 0) {
+        // Move the player back to their initial square
         player.reset();
     }
 };
@@ -126,9 +125,9 @@ Player.prototype.handleInput = function (direction) {
     }
 };
 
-// Return an object indicating which row and column the player is currently in
+// Return an object indicating the player's current x,y position on the screen
 Player.prototype.getPosition = function () {
-    return { col: this.col, row: this.row };
+    return { x: this.x, y: this.y };
 };
 
 // Reset the player's position and winning state
