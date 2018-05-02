@@ -25,10 +25,26 @@ function randomSpeed() {
     return (Math.random() * 3 + 3) * COL_WIDTH;
 }
 
-// Enemies our player must avoid
+// Superclass of Enemy and Player
+var Character = function () {
+    // Current position on screen
+    this.x = 0;
+    this.y = 0;
+    // Image used to render character (set by subclasses)
+    this.sprite = '';
+};
+
+// Render this character's image on the screen (using canvas)
+Character.prototype.render = function () {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+// Enemies our player must avoid - subclass of Character
 // Parameters:
 // row, which of the 3 road lanes this enemy should appear in (1, 2, or 3)
 var Enemy = function (row) {
+    Character.call(this);
+
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
@@ -37,9 +53,14 @@ var Enemy = function (row) {
     this.x = -COL_WIDTH;
     this.y = ROW_HEIGHT * row - ROW_OFFSET; // This never changes, for a given enemy
 
+    // New property, specific to Enemy and not from Character:
     // Speed (pixels per second)
     this.speed = randomSpeed();
 };
+
+// Set up Enemy as a subclass of Character
+Enemy.prototype = Object.create(Character.prototype);
+Enemy.prototype.constructor = Character;
 
 // Determine whether this enemy is near enough to the player to cause a collision
 Enemy.prototype.checkCollisions = function () {
@@ -68,14 +89,12 @@ Enemy.prototype.update = function (dt) {
     this.checkCollisions();
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function () {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// The character representing our player
+// The character representing our player - subclass of Character
 var Player = function () {
+    Character.call(this);
     this.sprite = 'images/char-boy.png';
+
+    // New properties, specific to Player (not from Character):
 
     // Initial (zero based) location in the game grid
     this.col = 2;
@@ -85,18 +104,22 @@ var Player = function () {
     this.won = false;
 };
 
+Player.prototype = Object.create(Character.prototype);
+Player.prototype.constructor = Character;
+
 // Update the player's screen coordinates
 Player.prototype.update = function () {
     this.x = COL_WIDTH * this.col;
     this.y = ROW_HEIGHT * this.row - ROW_OFFSET;
 };
 
-// Draw the player on the screen
+// Draw the player on the screen - override parent to include winning state
 Player.prototype.render = function () {
     if (this.won) {
         ctx.drawImage(Resources.get('images/Selector.png'), this.x, this.y);
     }
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    // Use parent's method to render the character's sprite
+    Character.prototype.render.call(this);
 };
 
 // Change the player's position according to keyboard input
