@@ -6,6 +6,8 @@ HTML, CSS, and JavaScript for a project from [Udacity's Front-End Developer nano
 
 [Play the game](https://kerryrodden.github.io/frontend-nanodegree-arcade-game/)
 
+Or, if you prefer to run locally, you can download or clone this repository, and then open the `index.html` file in your browser.
+
 ## How to play
 
 This is a simple arcade game in the style of [Frogger](https://en.wikipedia.org/wiki/Frogger). Use the arrow keys to move the player character across the road to the water, avoiding the bugs as you go.
