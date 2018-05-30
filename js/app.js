@@ -65,9 +65,9 @@ class Enemy extends Character {
 
     // Determine whether this enemy is near enough to the player to cause a collision
     checkCollisions() {
-        var playerPosition = player.getPosition();
-        var xDist = Math.abs(player.x - this.x);
-        var yDist = Math.abs(player.y - this.y);
+        const playerPosition = player.getPosition();
+        const xDist = Math.abs(player.x - this.x);
+        const yDist = Math.abs(player.y - this.y);
         // Horizontal collision distance = 40% of the column width
         if (xDist < COL_WIDTH * 0.4 && yDist === 0) {
             // Move the player back to their initial square
@@ -166,27 +166,27 @@ class Player extends Character {
         if (this.row === 0) {
             this.won = true;
             // Reset the player's position after a delay to show the winning state
-            // Use bind() to retain the current "this", because setTimeout uses "window" as "this"
-            setTimeout(this.reset.bind(this), 2000);
+            // Use arrow function so that we retain the desired value of 'this'
+            setTimeout(() => this.reset(), 2000);
         }
     }
 }
 
 // Instantiate the objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = [];
-for (var i = 0; i < NUM_ENEMIES; i++) {
-    var row = i % 3 + 1;
+const allEnemies = [];
+for (let i = 0; i < NUM_ENEMIES; i++) {
+    const row = i % 3 + 1;
     allEnemies.push(new Enemy(row));
 }
 
 // Place the player object in a variable called player
-var player = new Player();
+const player = new Player();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function (e) {
-    var allowedKeys = {
+document.addEventListener('keyup', e => {
+    const allowedKeys = {
         37: 'left',
         38: 'up',
         39: 'right',
