@@ -66,8 +66,8 @@ class Enemy extends Character {
     // Determine whether this enemy is near enough to the player to cause a collision
     checkCollisions() {
         const playerPosition = player.getPosition();
-        const xDist = Math.abs(player.x - this.x);
-        const yDist = Math.abs(player.y - this.y);
+        const xDist = Math.abs(playerPosition.x - this.x);
+        const yDist = Math.abs(playerPosition.y - this.y);
         // Horizontal collision distance = 40% of the column width
         if (xDist < COL_WIDTH * 0.4 && yDist === 0) {
             // Move the player back to their initial square
